@@ -3,7 +3,8 @@ import  {assets, dashboard_data} from '../../assets/assets'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import BlogTableItem from '../../components/admin/BlogTableItem'
-
+import { useAppContext } from '../../context/AppContext'
+import toast from 'react-hot-toast';
 
 const Dashboard = () => {
  const [dashboardData, setDashboardData] = useState({
@@ -12,11 +13,27 @@ const Dashboard = () => {
   drafts:0,
   recentBlogs:[]
  })
- const fetchDashboardData = () =>(
-  setDashboardData(dashboard_data))
 
-useEffect(()=>
-  fetchDashboardData(),[])
+ const {axios} = useAppContext() 
+
+ const fetchDashboardData = async() =>{
+  try {
+    const {data} = await axios.get('/api/admin/dashboard')
+    if(data.success){
+      setDashboardData(data.dashboardData)
+    }
+    else{
+      toast.error(data.message)
+    }
+  } catch (error) {
+    toast.error('Failed to fetch dashboard data')
+  }
+ }
+  
+
+useEffect(() => {
+  fetchDashboardData()
+}, [])
 
   return (
     <div className='flex-1 p-4 md:p-10 bg-blue-50/50'>

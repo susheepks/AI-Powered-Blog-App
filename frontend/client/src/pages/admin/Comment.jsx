@@ -3,19 +3,33 @@ import { useState } from 'react'
 import { comments_data } from '../../assets/assets' 
 import { useEffect } from 'react'
 import CommentTableItem from '../../components/admin/CommentTableItem'
-
+import { useAppContext } from '../../context/AppContext'
+import toast from 'react-hot-toast'
 
 const Comment = () => {
   const [comments, setComments] = useState([])
   const [filter, setFilter] = useState('Not Approved')
+  const {axios} = useAppContext()
 
   const fetchComments = async()=>{
-    setComments(comments_data)
+    try {
+      const {data} = await axios.get('api/admin/comments')
+      if(data.success)
+      { toast.success(data.message)
+        setComments(data.comments)
+      }else
+      {
+        toast.error(data.message)
+      }
+    } catch (error) {
+        toast.error(data.message)
+    }
   }
 
   useEffect(()=>{
     fetchComments()   
   },[])
+  
   return (
     <div className='flex-1 pt-5 sm:pt-12 sm:pl-12 bg-blue-50/50'>
        <div className='flex justify-between items-center max-w-3xl'>
